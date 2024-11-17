@@ -1,4 +1,4 @@
-# Password Generator - SQL
+# T-SQL Scripts
 
 <h2>About</h2>
 
