@@ -27,6 +27,14 @@ SELECT * FROM sys.dm_os_waiting_tasks				-- blocking_session_id
 
 SELECT * FROM sys.sysprocesses 
 
+
+SELECT * FROM sys.partition_schemes
+
+SELECT * FROM sys.partition_functions
+
+SELECt * FROM sys.partitions
+
+-- Scripts
 CREATE PROCEDURE ShowTrans
 AS 
 BEGIN 
