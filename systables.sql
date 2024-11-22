@@ -1,27 +1,45 @@
 USE master;
 GO
-
+--------------------------------------------
 -- INTERESTING System Tables and other stuff
+--------------------------------------------
 
--- SCHEMES in DATABASE
+-- The query retrieves all columns and rows from the sys.schemas system view in SQL Server. 
+-- This view contains information about all the schemas in the current database
 SELECT * FROM sys.schemas
 
--- USERS in DATABASE
+-- The query retrieves all columns and rows from the sys.sysusers system view in SQL Server. 
+-- This view contains one row for each user, group, or SQL Server role in the current database
 SELECT * FROM sys.sysusers
 
 -- WHO AM I ?
 SELECT USER_NAME()
 
+-- The query retrieves all columns and rows from the sys.dm_tran_active_transactions dynamic management view in SQL Server. 
+-- This view provides detailed information about active transactions within the SQL Server instance
+SELECT * FROM sys.dm_tran_active_transactions	
 
--- NEED TO GO THRU
-SELECT * FROM sys.dm_tran_active_transactions		-- transaction_id, name = 'user_transaction'
-SELECT * FROM sys.dm_tran_current_transaction		-- transaction_id
-SELECt * FROM sys.dm_tran_session_transactions		-- transaction_id, Session_id
-SELECT * FROM sys. dm_tran_database_transactions	-- transaction_id, database_id
+-- The query retrieves all columns from the sys.dm_tran_current_transaction dynamic management view in SQL Server. 
+-- This view returns a single row that displays the state information of the transaction in the current session
+SELECT * FROM sys.dm_tran_current_transaction
 
+-- The query retrieves all columns and rows from the sys.dm_tran_session_transactions dynamic management view in SQL Server. 
+-- This view provides correlation information for associated transactions and sessions
+SELECt * FROM sys.dm_tran_session_transactions	
+
+-- The query retrieves all columns and rows from the sys.dm_tran_database_transactions dynamic management view in SQL Server. 
+-- This DMV provides information about transactions at the database leve
+SELECT * FROM sys. dm_tran_database_transactions	
+
+-- The query returns the name of the database with database ID 1 in SQL Server.
 SELECT DB_NAME(1)
+
+-- The query returns the name of the database object with the object ID 32767. 
+-- However, this specific object ID is typically associated with a system object in SQL Server.
 SELECT OBJECT_NAME(32767)
 
+
+-- TO GO THRU
 SELECT * FROM sys.dm_tran_locks						-- resource_database_id, request_session_id
 SELECT * FROM sys.dm_os_waiting_tasks				-- blocking_session_id
 
@@ -33,6 +51,8 @@ SELECT * FROM sys.partition_schemes
 SELECT * FROM sys.partition_functions
 
 SELECt * FROM sys.partitions
+
+DBCC IND ('Tran', 'Aufgabe1_pvt', 1);
 
 -- Scripts
 CREATE PROCEDURE ShowTrans
