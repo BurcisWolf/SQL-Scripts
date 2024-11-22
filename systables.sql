@@ -34,6 +34,9 @@ SELECT * FROM sys. dm_tran_database_transactions
 -- The query returns the name of the database with database ID 1 in SQL Server.
 SELECT DB_NAME(1)
 
+-- The query returns the database ID of the database named 'CS_Sample' in SQL Server.
+SELECT DB_ID('CS_Sample') 
+
 -- The query returns the name of the database object with the object ID 32767. 
 -- However, this specific object ID is typically associated with a system object in SQL Server.
 SELECT OBJECT_NAME(32767)
@@ -52,7 +55,9 @@ SELECT * FROM sys.partition_functions
 
 SELECt * FROM sys.partitions
 
+-- PAGES
 DBCC IND ('Tran', 'Aufgabe1_pvt', 1);
+DBCC PAGE('CS_Sample',1,401,1) 
 
 -- Scripts
 CREATE PROCEDURE ShowTrans
