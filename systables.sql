@@ -41,9 +41,16 @@ SELECT DB_ID('CS_Sample')
 -- However, this specific object ID is typically associated with a system object in SQL Server.
 SELECT OBJECT_NAME(32767)
 
+<<<<<<< HEAD
 --The SQL query retrieves information about all currently active lock requests in SQL Server. 
 --This query accesses the sys.dm_tran_locks dynamic management view, which provides details on the lock manager resources that are either granted or waiting to be granted
 SELECT * FROM sys.dm_tran_locks		
+=======
+
+-- TO GO THRU
+SELECT * FROM sys.dm_tran_locks						-- resource_database_id, request_session_id
+SELECT * FROM sys.dm_os_waiting_tasks				-- blocking_session_id
+>>>>>>> 36547fb631b58e80828b7f9c498c44084a76255a
 
 -- The SQL query retrieves information about all tasks currently waiting for resources in SQL Server. 
 -- This dynamic management view (DMV) provides detailed insights into the wait queue, helping identify performance bottlenecks and troubleshoot blocking issues
