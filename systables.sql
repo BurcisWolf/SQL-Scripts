@@ -1,8 +1,38 @@
-USE master;
-GO
---------------------------------------------
--- INTERESTING System Tables and other stuff
---------------------------------------------
+----------------------
+-- INTERESTING SELECTs
+----------------------
+
+-- WHO AM I ?
+SELECT USER_NAME();
+
+-- DATE RIGHT NOW
+SELECT GETDATE();
+
+-- The query returns the name of the database with database ID 1 in SQL Server.
+SELECT DB_NAME(1);
+
+-- The query returns the database ID of the database named 'CS_Sample' in SQL Server.
+SELECT DB_ID('CS_Sample');
+
+-- The query returns the name of the database object with the object ID 32767. 
+-- However, this specific object ID is typically associated with a system object in SQL Server.
+SELECT OBJECT_NAME(32767);
+
+-- Which ID is behind this name
+SELECT OBJECT_ID('MeineSicht');
+
+-- The SQL function returns the Transact-SQL source text or definition of the object with the specified object ID (2021582240) in the current database context. 
+-- This function is useful for retrieving the full definition of database objects such as stored procedures, functions, views, or triggers
+SELECT OBJECT_DEFINITION(770101784);
+
+----------------------------
+-- INTERESTING System Tables
+----------------------------
+-- The SQL query retrieves information about all views in the current database. This command provides detailed metadata for each view
+SELECT * FROM sys.views 
+
+-- The SQL query retrieves information about all user-defined, schema-scoped objects within a database
+SELECT * FROM sys.objects 
 
 -- The query retrieves all columns and rows from the sys.schemas system view in SQL Server. 
 -- This view contains information about all the schemas in the current database
@@ -12,8 +42,13 @@ SELECT * FROM sys.schemas
 -- This view contains one row for each user, group, or SQL Server role in the current database
 SELECT * FROM sys.sysusers
 
--- WHO AM I ?
-SELECT USER_NAME()
+-- The query retrieves all columns and rows from the sys.sysdepends view in SQL Server. 
+-- This view contains dependency information between database objects.
+SELECT * FROM sys.sysdepends 
+
+-- The query retrieves detailed metadata about all columns in the current database. 
+-- This system view provides a comprehensive list of columns for all user-defined and system-defined tables, views, and other objects that have columns. 
+SELECT * FROM sys.all_columns
 
 -- The query retrieves all columns and rows from the sys.dm_tran_active_transactions dynamic management view in SQL Server. 
 -- This view provides detailed information about active transactions within the SQL Server instance
@@ -31,26 +66,9 @@ SELECt * FROM sys.dm_tran_session_transactions
 -- This DMV provides information about transactions at the database leve
 SELECT * FROM sys. dm_tran_database_transactions	
 
--- The query returns the name of the database with database ID 1 in SQL Server.
-SELECT DB_NAME(1)
-
--- The query returns the database ID of the database named 'CS_Sample' in SQL Server.
-SELECT DB_ID('CS_Sample') 
-
--- The query returns the name of the database object with the object ID 32767. 
--- However, this specific object ID is typically associated with a system object in SQL Server.
-SELECT OBJECT_NAME(32767)
-
-<<<<<<< HEAD
 --The SQL query retrieves information about all currently active lock requests in SQL Server. 
 --This query accesses the sys.dm_tran_locks dynamic management view, which provides details on the lock manager resources that are either granted or waiting to be granted
 SELECT * FROM sys.dm_tran_locks		
-=======
-
--- TO GO THRU
-SELECT * FROM sys.dm_tran_locks						-- resource_database_id, request_session_id
-SELECT * FROM sys.dm_os_waiting_tasks				-- blocking_session_id
->>>>>>> 36547fb631b58e80828b7f9c498c44084a76255a
 
 -- The SQL query retrieves information about all tasks currently waiting for resources in SQL Server. 
 -- This dynamic management view (DMV) provides detailed insights into the wait queue, helping identify performance bottlenecks and troubleshoot blocking issues
@@ -63,19 +81,58 @@ SELECT * FROM sys.sysprocesses
 -- The sys.partition_schemes view contains a row for each data space that is a partition scheme, with the type set to "PS" (Partition Scheme).
 SELECT * FROM sys.partition_schemes
 
+------------------------
+-------- OTHERS --------
+------------------------
 
+-- Changing owner of a Database, instead of AdventureWorks2012 we will write the Database we want to change
+USE [AdventureWorks2012]            
+exec sp_changedbowner 'sa', 'true'
 
+-- Declaring a Variable without initialization
+DECLARE @varName int;
 
+-- Declaring a Variable with initialization
+DECLARE @varName varchar(20) = 'Hello World';
+
+-- The command will display the definition of the database object named 'MeineSicht' in the current database. 
+-- This command is used to view the Transact-SQL source text of various database objects, including views, stored procedures, functions, triggers, and more
+EXECUTE sp_helptext 'MeineSicht';
+
+--------------------
 -- TO DO
 SELECT * FROM sys.partition_functions
 
 SELECt * FROM sys.partitions
 
--- PAGES
+-------------------------
+--------- PAGES ---------
+-------------------------
 DBCC IND ('Tran', 'Aufgabe1_pvt', 1);
 DBCC PAGE('CS_Sample',1,401,1) 
 
--- Scripts
+-------------------------
+-------- SCRIPTS --------
+-------------------------
+
+-- This SQL query retrieves detailed information about the dependencies of a specific view named 'MeineSicht'. 
+-- It joins data from sys.sysdepends and sys.all_columns to show which tables and columns the view depends on. 
+SELECT  
+	s.id AS [View-ID],
+	OBJECT_NAME(s.id) AS [View-Name],
+	s.depid AS [Tabellen-ID],
+	OBJECT_NAME(s.depid) AS [Tabellenname],
+	ac.column_id AS [Spalten ID],
+	ac.name AS [Spaltenname]
+FROM sys.sysdepends AS s 
+INNER JOIN sys.all_columns AS ac 
+	ON s.depid = ac.object_id
+WHERE 
+	s.id = OBJECT_ID('MeineSicht')
+	AND s.depnumber = ac.column_id
+
+
+-- TO DO
 CREATE PROCEDURE ShowTrans
 AS 
 BEGIN 
@@ -102,8 +159,6 @@ CROSS APPLY sys.dm_exec_sql_text ([s_ec].[most_recent_sql_handle]) AS [s_est]
 OUTER APPLY sys.dm_exec_query_plan ([s_er].[plan_handle]) AS [s_eqp]
 ORDER BY [Begin Time] ASC;
 END 
-
-GO
 
 -- und testen 
 EXEC ShowTrans
