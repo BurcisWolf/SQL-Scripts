@@ -25,6 +25,12 @@ SELECT OBJECT_ID('MeineSicht');
 -- This function is useful for retrieving the full definition of database objects such as stored procedures, functions, views, or triggers
 SELECT OBJECT_DEFINITION(770101784);
 
+-- returns the last identity value inserted into an identity column within the current execution scope in SQL Server
+SELECT SCOPE_IDENTITY();
+
+
+-- The SQL statement is used to retrieve the last identity value generated for the specified table, in this case, the Sales.Promotion table.
+SELECT IDENT_CURRENT('Sales.Promotion');
 ----------------------------
 -- INTERESTING System Tables
 ----------------------------
@@ -99,21 +105,23 @@ DECLARE @varName varchar(20) = 'Hello World';
 -- This command is used to view the Transact-SQL source text of various database objects, including views, stored procedures, functions, triggers, and more
 EXECUTE sp_helptext 'MeineSicht';
 
---------------------
--- TO DO
-SELECT * FROM sys.partition_functions
-
-SELECt * FROM sys.partitions
-
 -------------------------
 --------- PAGES ---------
 -------------------------
-DBCC IND ('Tran', 'Aufgabe1_pvt', 1);
-DBCC PAGE('CS_Sample',1,401,1) 
+
+-- The command DBCC TRACEON(3604) is used in SQL Server to enable a specific trace flag that affects how output from certain DBCC 
+-- (Database Console Commands) commands is displayed.
+DBCC TRACEON(3604)
 
 -------------------------
 -------- SCRIPTS --------
 -------------------------
+
+-- The SQL statement you provided uses the sys.fn_PhysLocFormatter function in conjunction with the %%physloc%% placeholder 
+-- to retrieve the physical location of rows in the dbo.Artikel table.
+SELECT 
+	sys.fn_PhysLocFormatter(%%physloc%%) AS Location, * 
+FROM dbo.Artikel;
 
 -- This SQL query retrieves detailed information about the dependencies of a specific view named 'MeineSicht'. 
 -- It joins data from sys.sysdepends and sys.all_columns to show which tables and columns the view depends on. 
@@ -131,8 +139,28 @@ WHERE
 	s.id = OBJECT_ID('MeineSicht')
 	AND s.depnumber = ac.column_id
 
+-- The SQL query you've provided retrieves detailed information about the database files in the current database context in SQL Server.
+Select 
+	DB_NAME() AS [DatenbankName], 
+	Name AS [logischer Name], 
+	file_id, 
+	physical_name,
+	size AS [Größe in Seite], 
+	size/8 AS [Anzahl Extents],
+	size/128.00 as [Größe in MB],
+	((size * 8.0/1024) - (FILEPROPERTY(name, 'SpaceUsed') * 8.0/1024)) As NochFrei
+From 
+	sys.database_files
 
 -- TO DO
+
+DBCC IND ('Tran', 'Aufgabe1_pvt', 1);
+DBCC PAGE('CS_Sample',1,401,1) 
+
+SELECT * FROM sys.partition_functions
+
+SELECt * FROM sys.partitions
+
 CREATE PROCEDURE ShowTrans
 AS 
 BEGIN 
