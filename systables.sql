@@ -100,6 +100,10 @@ SELECT * FROM sys.partitions
 -- The query retrieves information about all partition functions in the current database.
 SELECT * FROM sys.partition_functions
 
+-- The query retrieves all columns from the sys.trigger_event_types view and orders the results alphabetically by the type_name column. 
+-- This view contains information about all events or event groups on which a trigger can fire in SQL Server.
+SELECT * FROM sys.trigger_event_types ORDER BY type_name
+
 ------------------------
 -------- OTHERS --------
 ------------------------
@@ -192,6 +196,11 @@ SELECT ec.session_id, tst.is_user_transaction, st.text
    FROM sys.dm_tran_session_transactions tst 
       INNER JOIN sys.dm_exec_connections ec ON tst.session_id = ec.session_id
       CROSS APPLY sys.dm_exec_sql_text(ec.most_recent_sql_handle) st
+
+-- This SQL query retrieves information about the physical file locations of the system databases in SQL Server.
+SELECT name, physical_name AS current_file_location
+FROM sys.master_files
+WHERE database_id IN (DB_ID('master'), DB_ID('model'), DB_ID('msdb'), DB_ID('tempdb'));
 
 -- This SQL query retrieves detailed information about active database transactions, including session details, transaction log usage, and the most recent SQL text and query plan.
 CREATE PROCEDURE ShowTrans
