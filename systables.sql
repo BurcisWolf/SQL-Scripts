@@ -28,12 +28,19 @@ SELECT OBJECT_DEFINITION(770101784);
 -- returns the last identity value inserted into an identity column within the current execution scope in SQL Server
 SELECT SCOPE_IDENTITY();
 
-
 -- The SQL statement is used to retrieve the last identity value generated for the specified table, in this case, the Sales.Promotion table.
 SELECT IDENT_CURRENT('Sales.Promotion');
+
+-- The SQL command returns the number of active transactions for the current connection
+SELECT @@TRANCOUNT
+
+-- The SQL returns the state of the current user transaction in the session. XACT_STATE() is a scalar function that reports one of three possible values
+SELECT XACT_STATE();
+
 ----------------------------
 -- INTERESTING System Tables
 ----------------------------
+
 -- The SQL query retrieves information about all views in the current database. This command provides detailed metadata for each view
 SELECT * FROM sys.views 
 
@@ -66,7 +73,7 @@ SELECT * FROM sys.dm_tran_current_transaction
 
 -- The query retrieves all columns and rows from the sys.dm_tran_session_transactions dynamic management view in SQL Server. 
 -- This view provides correlation information for associated transactions and sessions
-SELECt * FROM sys.dm_tran_session_transactions	
+SELECT * FROM sys.dm_tran_session_transactions	
 
 -- The query retrieves all columns and rows from the sys.dm_tran_database_transactions dynamic management view in SQL Server. 
 -- This DMV provides information about transactions at the database leve
@@ -86,6 +93,12 @@ SELECT * FROM sys.sysprocesses
 -- The query retrieves information about all partition schemes defined in a SQL Server database. 
 -- The sys.partition_schemes view contains a row for each data space that is a partition scheme, with the type set to "PS" (Partition Scheme).
 SELECT * FROM sys.partition_schemes
+
+-- The query retrieves information about all partitions of tables and most types of indexes in the database. 
+SELECT * FROM sys.partitions
+
+-- The query retrieves information about all partition functions in the current database.
+SELECT * FROM sys.partition_functions
 
 ------------------------
 -------- OTHERS --------
@@ -113,6 +126,12 @@ EXECUTE sp_helptext 'MeineSicht';
 -- (Database Console Commands) commands is displayed.
 DBCC TRACEON(3604)
 
+-- The query is used to obtain a list of pages used by a specific table or index in a SQL Server database. 
+DBCC IND ('Tran', 'Aufgabe1_pvt', 1);
+
+-- The command will display information about page 401 in file 1 of the CS_Sample database, with print option 1. 
+DBCC PAGE('CS_Sample',1,401,1) 
+
 -------------------------
 -------- SCRIPTS --------
 -------------------------
@@ -122,6 +141,17 @@ DBCC TRACEON(3604)
 SELECT 
 	sys.fn_PhysLocFormatter(%%physloc%%) AS Location, * 
 FROM dbo.Artikel;
+
+-- The SQL command is used in SQL Server to enable the display of advanced configuration options.
+EXEC sp_configure 'show advanced options',1
+Reconfigure
+
+-- The SQL command enables the xp_cmdshell extended stored procedure in SQL Server
+EXEC sp_configure 'xp_cmdshell',1; 
+Reconfigure
+
+-- The command is used to remove the internal representation of an XML document in SQL Server and invalidate its document handle
+EXEC Sp_xml_removedocument 
 
 -- This SQL query retrieves detailed information about the dependencies of a specific view named 'MeineSicht'. 
 -- It joins data from sys.sysdepends and sys.all_columns to show which tables and columns the view depends on. 
@@ -152,15 +182,18 @@ Select
 From 
 	sys.database_files
 
--- TO DO
+-- The SQL query retrieves information about all processes with open transactions, sorted by the most recent batch execution time.
+SELECT * FROM sys.sysprocesses 
+WHERE open_tran > 0
+ORDER BY last_batch DESC
 
-DBCC IND ('Tran', 'Aufgabe1_pvt', 1);
-DBCC PAGE('CS_Sample',1,401,1) 
+-- The provided SQL query combines information to retrieve detailed information about active transactions and their associated executing requests.
+SELECT ec.session_id, tst.is_user_transaction, st.text 
+   FROM sys.dm_tran_session_transactions tst 
+      INNER JOIN sys.dm_exec_connections ec ON tst.session_id = ec.session_id
+      CROSS APPLY sys.dm_exec_sql_text(ec.most_recent_sql_handle) st
 
-SELECT * FROM sys.partition_functions
-
-SELECt * FROM sys.partitions
-
+-- This SQL query retrieves detailed information about active database transactions, including session details, transaction log usage, and the most recent SQL text and query plan.
 CREATE PROCEDURE ShowTrans
 AS 
 BEGIN 
@@ -188,5 +221,9 @@ OUTER APPLY sys.dm_exec_query_plan ([s_er].[plan_handle]) AS [s_eqp]
 ORDER BY [Begin Time] ASC;
 END 
 
--- und testen 
-EXEC ShowTrans
+
+
+
+
+
+
