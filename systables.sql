@@ -104,6 +104,19 @@ SELECT * FROM sys.partition_functions
 -- This view contains information about all events or event groups on which a trigger can fire in SQL Server.
 SELECT * FROM sys.trigger_event_types ORDER BY type_name
 
+-- This view contains information about server-level principals, which include: SQL logins, Windows logins, Server roles, Certificates, Asymmetric keys
+SELECT * FROM sys.server_principals
+
+-- The SQL query retrieves all columns and rows from the sys.sql_logins catalog view in SQL Server. 
+-- This view provides detailed information specifically about SQL Server authentication logins.
+SELECT * FROM sys.sql_logins 
+
+-- The SQL query retrieves all columns and rows from the sys.server_role_members catalog view in SQL Server. This view shows the membership of logins in server roles
+SELECT * FROM sys.server_role_members
+
+-- The SQL query retrieves all built-in permissions applicable to the SERVER securable class in SQL Server, sorted alphabetically by permission name. 
+SELECT * FROM sys.fn_builtin_permissions('SERVER') ORDER BY permission_name;
+
 ------------------------
 -------- OTHERS --------
 ------------------------
@@ -121,6 +134,20 @@ DECLARE @varName varchar(20) = 'Hello World';
 -- The command will display the definition of the database object named 'MeineSicht' in the current database. 
 -- This command is used to view the Transact-SQL source text of various database objects, including views, stored procedures, functions, triggers, and more
 EXECUTE sp_helptext 'MeineSicht';
+
+-- The command returns a list of SQL Server fixed server roles along with their descriptions
+EXEC sp_helpsrvrole
+
+-- The command returns information about the members of SQL Server fixed server roles. 
+-- When executed without parameters, it provides details for all fixed server roles that have at least one member
+EXEC sp_helpsrvrolemember
+
+-- The command in SQL Server is used to display the permissions associated with fixed server roles. 
+-- When executed, it returns a list of permissions for all fixed server roles or for a specific role if specified. 
+EXEC sp_srvrolepermission
+
+-- IS_SRVROLEMEMBER is a SQL Server function that indicates whether a SQL Server login is a member of a specified server role
+IF IS_SRVROLEMEMBER('sysadmin') = 1
 
 -------------------------
 --------- PAGES ---------
@@ -190,6 +217,19 @@ From
 SELECT * FROM sys.sysprocesses 
 WHERE open_tran > 0
 ORDER BY last_batch DESC
+
+-- This SQL query retrieves information about members of a specific server role named 'Modify_Databases'. 
+SELECT 
+    roles.name AS RoleName,
+    members.name AS MemberName
+FROM 
+    sys.server_role_members AS srm
+INNER JOIN 
+    sys.server_principals AS roles ON srm.role_principal_id = roles.principal_id
+INNER JOIN 
+    sys.server_principals AS members ON srm.member_principal_id = members.principal_id
+WHERE 
+    roles.name = 'Modify_Databases';
 
 -- The provided SQL query combines information to retrieve detailed information about active transactions and their associated executing requests.
 SELECT ec.session_id, tst.is_user_transaction, st.text 
