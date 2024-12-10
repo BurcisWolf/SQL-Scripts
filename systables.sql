@@ -242,6 +242,20 @@ SELECT name, physical_name AS current_file_location
 FROM sys.master_files
 WHERE database_id IN (DB_ID('master'), DB_ID('model'), DB_ID('msdb'), DB_ID('tempdb'));
 
+
+-- This SQL query retrieves and displays the current transaction isolation level for the active session in SQL Server. 
+SELECT CASE transaction_isolation_level 
+	WHEN 0 THEN 'Unspecified' 
+	WHEN 1 THEN 'ReadUncommitted' 
+	WHEN 2 THEN 'ReadCommitted' 
+	WHEN 3 THEN 'Repeatable' 
+	WHEN 4 THEN 'Serializable' 
+	WHEN 5 THEN 'Snapshot' 
+END 
+AS TRANSACTION_ISOLATION_LEVEL 
+FROM sys.dm_exec_sessions 
+WHERE session_id = @@SPID
+
 -- This SQL query retrieves detailed information about active database transactions, including session details, transaction log usage, and the most recent SQL text and query plan.
 CREATE PROCEDURE ShowTrans
 AS 
